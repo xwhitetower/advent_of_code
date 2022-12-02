@@ -1,11 +1,24 @@
+// Fetcher downloads the input and test data for each day.
+// It is not fool proof and sometimes can fail to extract the correct data.
 use std::env;
-use std::fs::File;
-use std::io::{Read, Write};
+use std::fs::{File, create_dir_all};
+use std::io::{Read, Write, ErrorKind};
 use std::error::Error;
 use reqwest::blocking::Client;
 
 struct Session {
     value: String
+}
+
+fn create_directories(day: &str, part: &str) -> Result<(), Box<dyn Error>> {
+    match create_dir_all(format!("data/day{}/part{}/", day, part)) {
+        Ok(_) => (),
+        Err(error) => match error.kind() {
+            ErrorKind::AlreadyExists => (),
+            _ => return Err(Box::new(error)),
+        }
+    }
+    Ok(())
 }
 
 fn get_input(session: &Session, day: &str) -> Result<(), Box<dyn Error>> {
@@ -79,6 +92,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let session = Session { value: env::var("AOC_SESSION")? };
     let day = std::env::args().nth(1).expect("no day given");
     let part = std::env::args().nth(2).expect("no part given");
+    create_directories(&day, &part)?;
     get_input(&session, &day)?;
     discover_test_data(&session, &day, &part)?;
     Ok(())
