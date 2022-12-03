@@ -13,3 +13,4 @@ and can be run by `cargo run --bin name_of_bin`.
 
 This project contains a fetcher that can discover and download the test and normal problem inputs.
 Usage `cargo run --bin fetcher <day_number> <part>`
+It requires the Advent of Code browser session stored in the `AOC_SESSION` ENV variable

@@ -17,6 +17,11 @@ fn solve(lines: Vec<String>) -> Result<i32, Box<dyn Error>> {
     Ok(max_calories)
 }
 
+fn main() -> Result<(), Box<dyn Error>> {
+    println!("{}", solve(read_lines("./data/day1/input.txt")?)?);
+    Ok(())
+}
+
 #[test]
 fn test() -> Result<(), Box<dyn Error>> {
     let lines = read_lines("./data/day1/test_input.txt")?;
@@ -25,10 +30,5 @@ fn test() -> Result<(), Box<dyn Error>> {
         .expect("Missing test input.txt")
         .parse::<i32>()?;
     assert_eq!(solve(lines)?, expect);
-    Ok(())
-}
-
-fn main() -> Result<(), Box<dyn Error>> {
-    println!("{}", solve(read_lines("./data/day1/input.txt")?)?);
     Ok(())
 }

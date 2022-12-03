@@ -21,6 +21,11 @@ fn score(line: &str) -> u32 {
     SCORE_MATRIX[result_index as usize][(enemy_move - ENEMY_ROCK) as usize] + result_index * 3
 }
 
+fn main() -> Result<(), Box<dyn Error>> {
+    println!("{}", solve(read_lines("./data/day2/input.txt")?));
+    Ok(())
+}
+
 #[test]
 fn test() {
     let lines = read_lines("./data/day2/test_input.txt").unwrap();
@@ -78,7 +83,3 @@ fn test_enemy_scissors_win()  {
     assert_eq!(solve(vec!["C Z".to_string()]), 7);
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
-    println!("{}", solve(read_lines("./data/day2/input.txt")?));
-    Ok(())
-}
