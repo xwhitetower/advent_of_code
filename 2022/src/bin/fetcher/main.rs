@@ -44,7 +44,7 @@ fn discover_test_data(session: &Session, day: &str, part: &str) -> Result<(), Bo
 }
 
 fn discover_test_input(html_body: &str) -> Result<String, Box<dyn Error>> {
-    let test_input_candidate = find_last_element(html_body, "pre","<code>")?;
+    let test_input_candidate = find_first_element(html_body, "pre","<code>")?;
     let test_input = remove_tag(&test_input_candidate, "code")?;
     Ok(test_input)
 }
@@ -53,6 +53,18 @@ fn discover_test_result(html_body: &str) -> Result<String, Box<dyn Error>> {
     let test_result_candidate = find_last_element(html_body, "code","<em>")?;
     let test_result = remove_tag(&test_result_candidate, "em")?;
     Ok(test_result)
+}
+
+fn find_first_element(html_body: &str, tag: &str, filter: &str) -> Result<String, Box<dyn Error>> {
+    let document = scraper::Html::parse_document(&html_body);
+    let code_selector = scraper::Selector::parse(tag).unwrap();
+    Ok(
+        document.select(&code_selector)
+        .filter(|x| x.inner_html().contains(filter))
+        .next()
+        .expect("html parse error")
+        .inner_html()
+    )
 }
 
 fn find_last_element(html_body: &str, tag: &str, filter: &str) -> Result<String, Box<dyn Error>> {
