@@ -17,7 +17,7 @@ jobs:
       shell: bash
       run: |
         cd ${GITHUB_WORKSPACE}/2022/
-        cargo test
+        cargo test -r
     - name: Run Advent Of Code 2022
       shell: bash
       run: |
