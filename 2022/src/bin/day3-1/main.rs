@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::error::Error;
+use std::time::Instant;
 
 use advent_of_code::read_lines;
 
@@ -27,7 +28,9 @@ fn char_to_priority(c: char) -> u32 {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let timer = Instant::now();
     println!("{}", solve(read_lines("./data/day3/input.txt")?));
+    println!("total time [{:.2?}]", timer.elapsed());
     Ok(())
 }
 

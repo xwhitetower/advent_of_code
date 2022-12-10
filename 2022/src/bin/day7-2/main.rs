@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::error::Error;
+use std::time::Instant;
 
 use advent_of_code::read_lines;
 
@@ -64,7 +65,9 @@ fn files(lines: &Vec<String>) -> Vec<FileNode> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let timer = Instant::now();
     println!("{}", solve(read_lines("./data/day7/input.txt")?));
+    println!("total time [{:.2?}]", timer.elapsed());
     Ok(())
 }
 

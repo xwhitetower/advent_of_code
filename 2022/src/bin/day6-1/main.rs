@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::error::Error;
+use std::time::Instant;
 
 use advent_of_code::read_lines;
 
@@ -15,8 +16,10 @@ fn solve(signal: &str) -> Result<u32, Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let timer = Instant::now();
     let signal = &read_lines("./data/day6/input.txt")?[0];
     println!("{}", solve(signal)?);
+    println!("total time [{:.2?}]", timer.elapsed());
     Ok(())
 }
 

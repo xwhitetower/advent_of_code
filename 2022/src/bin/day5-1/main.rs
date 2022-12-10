@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::time::Instant;
 
 use advent_of_code::read_lines;
 
@@ -54,7 +55,9 @@ fn get_solution(cargo: &Vec<Vec<char>>) -> String {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let timer = Instant::now();
     println!("{}", solve(read_lines("./data/day5/input.txt")?));
+    println!("total time [{:.2?}]", timer.elapsed());
     Ok(())
 }
 

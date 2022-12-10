@@ -1,0 +1,29 @@
+name: advent of code - 2022
+
+on:
+  push:
+    paths:
+      - .github/workflows/2022.yml
+      - '2022/**'
+
+jobs:
+  AOC-2022:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build & Test Advent Of Code 2022
+      shell: bash
+      run: |
+        cd ${GITHUB_WORKSPACE}/2022/
+        cargo test
+    - name: Run Advent Of Code 2022
+      shell: bash
+      run: |
+        cd ${GITHUB_WORKSPACE}/2022/
+        for d in ${GITHUB_WORKSPACE}/2022/src/bin/day*/ ; do
+          echo "Running day $(basename ${d})"
+          cargo run -r --bin $(basename ${d})
+          echo
+        done

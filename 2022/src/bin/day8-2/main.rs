@@ -14,7 +14,6 @@ fn highest_scenic_score(trees: &Vec<Vec<char>>) -> u32 {
 
     let row_count = trees.len();
     let column_count = trees[0].len();
-    let test = tree_scenic_score(trees, 3, 2);
     for i in 0..row_count {
         for j in 0..column_count {
             max_score = max(max_score, tree_scenic_score(trees, i, j));
