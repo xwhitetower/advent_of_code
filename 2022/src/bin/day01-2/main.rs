@@ -18,9 +18,11 @@ fn solve(lines: Vec<String>) -> Result<i32, Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let lines = read_lines("./data/day1/input.txt")?;
     let timer = Instant::now();
-    println!("{}", solve(read_lines("./data/day1/input.txt")?)?);
+    let solution =  solve(lines)?;
     println!("total time [{:.2?}]", timer.elapsed());
+    println!("{}", solution);
     Ok(())
 }
 

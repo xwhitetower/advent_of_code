@@ -20,9 +20,11 @@ fn parse_range(pair: &str) -> Vec<u32> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let lines = read_lines("./data/day4/input.txt")?;
     let timer = Instant::now();
-    println!("{}", solve(read_lines("./data/day4/input.txt")?));
+    let solution =  solve(lines);
     println!("total time [{:.2?}]", timer.elapsed());
+    println!("{}", solution);
     Ok(())
 }
 

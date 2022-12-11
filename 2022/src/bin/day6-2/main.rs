@@ -16,10 +16,11 @@ fn solve(signal: &str) -> Result<u32, Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let timer = Instant::now();
     let signal = &read_lines("./data/day6/input.txt")?[0];
-    println!("{}", solve(signal)?);
+    let timer = Instant::now();
+    let solution =  solve(signal)?;
     println!("total time [{:.2?}]", timer.elapsed());
+    println!("{}", solution);
     Ok(())
 }
 

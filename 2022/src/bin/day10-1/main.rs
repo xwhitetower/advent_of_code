@@ -33,9 +33,11 @@ fn is_power_check_cycle(cycle: i32) -> bool {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let lines = read_lines("./data/day10/input.txt")?;
     let timer = Instant::now();
-    println!("{}", solve(read_lines("./data/day10/input.txt")?));
+    let solution =  solve(lines);
     println!("total time [{:.2?}]", timer.elapsed());
+    println!("{}", solution);
     Ok(())
 }
 

@@ -23,9 +23,11 @@ fn score(line: &str) -> u32 {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let lines = read_lines("./data/day2/input.txt")?;
     let timer = Instant::now();
-    println!("{}", solve(read_lines("./data/day2/input.txt")?));
+    let solution =  solve(lines);
     println!("total time [{:.2?}]", timer.elapsed());
+    println!("{}", solution);
     Ok(())
 }
 
