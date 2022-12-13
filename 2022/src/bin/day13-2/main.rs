@@ -16,9 +16,8 @@ fn solve(lines: Vec<String>) -> u32 {
                 smaller_than_6 += 1;
             } else {
                 let pos = digit_pos.unwrap();
-                if (close_pos == None || pos < close_pos.unwrap()) && (pos == line.len() - 1
-                        || !(line[pos+1..].chars().next().unwrap() >= '0' && line[pos+1..].chars().next().unwrap() <= '9')
-                    ) {
+                if pos == line.len() - 1
+                        || !(line[pos+1..].chars().next().unwrap() >= '0' && line[pos+1..].chars().next().unwrap() <= '9') {
                     let current_char = line[pos..].chars().next().unwrap();
                     if current_char < '2' { smaller_than_2 += 1 }
                     if current_char < '6' { smaller_than_6 += 1 }
