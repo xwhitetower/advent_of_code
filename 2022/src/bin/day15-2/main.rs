@@ -90,6 +90,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 fn test() {
     let lines = read_lines("./data/day15/test_input.txt").unwrap();
     let expected_lines = read_lines("./data/day15/part2/test_result.txt").unwrap();
-    let expect = expected_lines.first().unwrap().parse::<u32>().unwrap();
+    let expect = expected_lines.first().unwrap().parse::<u64>().unwrap();
     assert_eq!(solve(lines, 20), expect);
 }
