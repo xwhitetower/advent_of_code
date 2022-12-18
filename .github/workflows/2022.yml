@@ -23,7 +23,11 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/2022/
         for d in ${GITHUB_WORKSPACE}/2022/src/bin/day*/ ; do
-          echo "Running day $(basename ${d})"
-          cargo run -r --bin $(basename ${d})
+          if [ $(basename ${d}) = "day16-2" ]; then
+            echo "Skip slow solution $(basename ${d})"
+          else
+            echo "Running day $(basename ${d})"
+            cargo run -r --bin $(basename ${d})
+          fi
           echo
         done
