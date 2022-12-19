@@ -12,7 +12,7 @@ const RIGHT: char = '>';
 const EMPTY: char = '.';
 const BLOCKED: char = '#';
 static MAP_BOUND_SIZE: i32 = 7;
-static ROUNDS: u32 = 2022;
+static ROUNDS: u64 = 1_000_000_000_000;
 
 struct Tetris {
     pixels: Vec<u8>,
@@ -33,7 +33,7 @@ struct Metadata {
 }
 
 // Using Brent https://en.wikipedia.org/wiki/Cycle_detection#Brent's_algorithm
-fn solve(lines: Vec<String>) -> u32 {
+fn solve(lines: Vec<String>) -> u64 {
     let flows: Vec<char> = lines[0].chars().collect();
     let pieces: Vec<Tetris> = init_tetris();
     let mut current_flow_idx: usize = 0;
@@ -89,7 +89,7 @@ fn solve(lines: Vec<String>) -> u32 {
     let delta = states[hare].height - states[tortoise].height;
     let full_cycles_height = delta * ((ROUNDS as usize - mu) / lam);
     let partial_cycle = states[tortoise + ((ROUNDS as usize - mu) % lam)].height - states[tortoise].height;
-    (states[tortoise].height + full_cycles_height + partial_cycle) as u32
+    (states[tortoise].height + full_cycles_height + partial_cycle) as u64
 }
 
 fn init_tetris() -> Vec<Tetris> {
@@ -188,7 +188,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 #[test]
 fn test() {
     let lines = read_lines("./data/day17/test_input.txt").unwrap();
-    let expected_lines = read_lines("./data/day17/part1/test_result.txt").unwrap();
-    let expect = expected_lines.first().unwrap().parse::<u32>().unwrap();
+    let expected_lines = read_lines("./data/day17/part2/test_result.txt").unwrap();
+    let expect = expected_lines.first().unwrap().parse::<u64>().unwrap();
     assert_eq!(solve(lines), expect);
 }
