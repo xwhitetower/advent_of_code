@@ -33,7 +33,9 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/2023/
         for d in ${GITHUB_WORKSPACE}/2023/src/day*/ ; do
-          echo "Running day $(basename ${d})"
-          bin/$(basename ${d}) ${GITHUB_WORKSPACE}/2023/data/$(basename ${d})/input.txt
+          exec_name=$(basename ${d})
+          input_path=${GITHUB_WORKSPACE}/2023/data/${exec_name::-2}/input.txt
+          echo "Running day ${exec_name} ${input_path}"
+          bin/${exec_name} ${input_path}
           echo
         done
