@@ -1,0 +1,39 @@
+name: AoC - 2023
+
+on:
+  push:
+    paths:
+      - .github/workflows/2023.yml
+      - '2023/**'
+
+jobs:
+  AOC-2023:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Aoc 2023 - Deps
+      shell: bash
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x ./llvm.sh
+        sudo ./llvm.sh 17
+        sudo apt-get update
+        sudo apt install libtbb-dev libc++-17-dev libc++abi-17-dev
+
+    - name: AoC 2023 - Build
+      shell: bash
+      run: |
+        cd ${GITHUB_WORKSPACE}/2023/
+        bash build.sh
+
+    - name: AoC 2023 - Run
+      shell: bash
+      run: |
+        cd ${GITHUB_WORKSPACE}/2023/
+        for d in ${GITHUB_WORKSPACE}/2023/d*/ ; do
+          echo "Running day $(basename ${d})"
+          bin/$(basename ${d}) ${GITHUB_WORKSPACE}/2023/data/$(basename ${d})/input.txt
+          echo
+        done
