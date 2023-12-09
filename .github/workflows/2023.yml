@@ -32,7 +32,7 @@ jobs:
       shell: bash
       run: |
         cd ${GITHUB_WORKSPACE}/2023/
-        for d in ${GITHUB_WORKSPACE}/2023/day*/ ; do
+        for d in ${GITHUB_WORKSPACE}/2023/src/day*/ ; do
           echo "Running day $(basename ${d})"
           bin/$(basename ${d}) ${GITHUB_WORKSPACE}/2023/data/$(basename ${d})/input.txt
           echo
