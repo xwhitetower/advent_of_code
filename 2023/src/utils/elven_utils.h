@@ -21,6 +21,10 @@ namespace ElvenUtils {
             return !is(x, y);
         }
 
+
+        bool operator<(const Point& other) const {
+            return x < other.x || (x == other.x && y < other.y) ;
+        }
         bool operator==(const Point& other) const {
             return std::tie(x, y) == std::tie(other.x, other.y);
         }
@@ -51,9 +55,10 @@ namespace ElvenUtils {
                 }
             );
         }
+        explicit Map(const std::vector<std::vector<char>> &map) : map(map) {}
         Map(const Map& other) = default;
 
-        Point find(const char element) {
+        [[nodiscard]] Point find(const char element) const {
             for (size_t i = 0; i < map.size(); ++i) {
                 if (auto it = std::ranges::find(map[i].begin(), map[i].end(), element); it != map[i].end()) {
                     return Point{static_cast<X>(it - map[i].begin()), i};

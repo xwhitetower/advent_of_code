@@ -68,7 +68,7 @@ Distance farthest_loop_distance(const Point &start_position, const ElvenUtils::M
 }
 
 std::size_t solve(const ElvenIO::input_type &input) {
-    ElvenUtils::Map map(input);
+    const ElvenUtils::Map map(input);
     return farthest_loop_distance(map.find(START_MARKER), map);
 }
 
