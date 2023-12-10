@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fexperimental-library")
 
 include_directories(src/utils)
 
-foreach(day RANGE 1 9 )
+foreach(day RANGE 1 10)
     if(${day} LESS 10)
         set(day_prefix 0)
     else()
