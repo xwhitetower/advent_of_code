@@ -4,6 +4,8 @@
 #include <set>
 #include <__numeric/transform_reduce.h>
 
+#include "elven_measure.h"
+
 auto parse_winners(const std::string &line) {
     std::regex number_regex("(\\d+)");
     auto colon_pos = line.find(':');
@@ -61,15 +63,8 @@ size_t solve(const std::vector<std::tuple<std::set<int>, std::vector<int>>> card
 }
 
 int main(int _, char** argv) {
-    using namespace std::chrono;
-
-    const auto lines = parse_input(argv[1]);
-    const auto start {high_resolution_clock::now()};
-    const auto solution {solve(lines)};
-    const auto end {high_resolution_clock::now()};
-    std::cout << solution << std::endl;
-    const duration<double> elapsed_seconds{end - start};
-    std::cout << elapsed_seconds.count() * 1000 << "ms" << std::endl;
-    std::cout << elapsed_seconds.count() * 1000000 << "µs" << std::endl;
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
+    ElvenMeasure::report(result, io_time, solution_time);
     return 0;
 }

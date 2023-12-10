@@ -5,6 +5,8 @@ project(advent_of_code_2023_CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fexperimental-library")
 
+include_directories(src/utils)
+
 foreach(day RANGE 1 9 )
     if(${day} LESS 10)
         set(day_prefix 0)

@@ -2,6 +2,8 @@
 #include <fstream>
 #include <numeric>
 
+#include "elven_measure.h"
+
 auto parse_input(const char* filename) {
     std::fstream file(filename);
     std::vector<std::string> lines;
@@ -25,7 +27,7 @@ std::size_t solve(const std::vector<std::string> &lines) {
         std::plus(),
         [=](auto line) {
             // THIS IS AWFUL FIX
-            size_t high = 0;
+            size_t high = -1;
             size_t low = 0;
             for ( int i = 0 ; i < line.length(); i++) {
                 int digit = -1;
@@ -34,7 +36,7 @@ std::size_t solve(const std::vector<std::string> &lines) {
                 } else {
                     for(int j = 0 ; j < numbers.size(); j++) {
                         if (strncmp(&line[i], numbers[j].c_str(), numbers[j].length()) == 0) {
-                            digit = j;
+                            digit = j + 1;
                             break;
                         }
                     }
@@ -44,21 +46,14 @@ std::size_t solve(const std::vector<std::string> &lines) {
                     low = digit;
                 }
             }
-            return (high - '0') * 10 + (low - '0');
+            return high * 10 + low;
         }
     );
 }
 
 int main(int _, char** argv) {
-    using namespace std::chrono;
-
-    const auto lines = parse_input(argv[1]);
-    const auto start {high_resolution_clock::now()};
-    const auto solution {solve(lines)};
-    const auto end {high_resolution_clock::now()};
-    std::cout << solution << std::endl;
-    const duration<double> elapsed_seconds{end - start};
-    std::cout << elapsed_seconds.count() * 1000 << "ms" << std::endl;
-    std::cout << elapsed_seconds.count() * 1000000 << "µs" << std::endl;
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
+    ElvenMeasure::report(result, io_time, solution_time);
     return 0;
 }

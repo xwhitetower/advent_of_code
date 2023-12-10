@@ -2,6 +2,8 @@
 #include <fstream>
 #include <map>
 
+#include "elven_measure.h"
+
 typedef size_t card_value;
 enum HandScore {
     five_kind = 6,
@@ -96,15 +98,8 @@ size_t solve(std::vector<play> &plays) {
 }
 
 int main(int _, char** argv) {
-    using namespace std::chrono;
-
-    auto plays = parse_input(argv[1]);
-    const auto start {high_resolution_clock::now()};
-    const auto solution {solve(plays)};
-    const auto end {high_resolution_clock::now()};
-    std::cout << solution << std::endl;
-    const duration<double> elapsed_seconds{end - start};
-    std::cout << elapsed_seconds.count() * 1000 << "ms" << std::endl;
-    std::cout << elapsed_seconds.count() * 1000000 << "µs" << std::endl;
+    auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
+    ElvenMeasure::report(result, io_time, solution_time);
     return 0;
 }

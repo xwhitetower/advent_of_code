@@ -3,6 +3,8 @@
 #include <map>
 #include <numeric>
 
+#include "elven_measure.h"
+
 enum instruction {
     left = 0,
     right = 1
@@ -50,16 +52,13 @@ auto solve_single(const node_id &start_node, const size_t start_steps, const std
     return steps;
 }
 
-size_t solve(
-    const std::vector<instruction> &instructions,
-    const std::vector<node_id> &start_nodes,
-    const node_maps &nodes
-    ) {
+size_t solve(const std::tuple<std::vector<instruction>, std::vector<node_id>, node_maps> &input) {
+    const auto [instructions, start_nodes, nodes] = input;
     std::vector<size_t> cycles;
     std::ranges::transform(
         start_nodes.begin(), start_nodes.end(),
         std::back_inserter(cycles),
-        [=](auto node) { return solve_single(node, 0, instructions, nodes); }
+        [&instructions, &nodes](auto node) { return solve_single(node, 0, instructions, nodes); }
     );
 
     return std::accumulate(
@@ -71,15 +70,8 @@ size_t solve(
 }
 
 int main(int _, char** argv) {
-    using namespace std::chrono;
-
-    auto [instructions, start_nodes, nodes] = parse_input(argv[1]);
-    const auto start {high_resolution_clock::now()};
-    const auto solution {solve(instructions, start_nodes, nodes)};
-    const auto end {high_resolution_clock::now()};
-    std::cout << solution << std::endl;
-    const duration<double> elapsed_seconds{end - start};
-    std::cout << elapsed_seconds.count() * 1000 << "ms" << std::endl;
-    std::cout << elapsed_seconds.count() * 1000000 << "µs" << std::endl;
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
+    ElvenMeasure::report(result, io_time, solution_time);
     return 0;
 }

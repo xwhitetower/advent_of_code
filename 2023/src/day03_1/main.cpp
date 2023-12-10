@@ -2,6 +2,8 @@
 #include <fstream>
 #include <numeric>
 
+#include "elven_measure.h"
+
 constexpr auto EMPTY = '.';
 
 auto parse_input(const char* filename) {
@@ -53,15 +55,8 @@ size_t solve(const std::vector<std::string> &schematic) {
 }
 
 int main(int _, char** argv) {
-    using namespace std::chrono;
-
-    const auto lines = parse_input(argv[1]);
-    const auto start {high_resolution_clock::now()};
-    const auto solution {solve(lines)};
-    const auto end {high_resolution_clock::now()};
-    std::cout << solution << std::endl;
-    const duration<double> elapsed_seconds{end - start};
-    std::cout << elapsed_seconds.count() * 1000 << "ms" << std::endl;
-    std::cout << elapsed_seconds.count() * 1000000 << "µs" << std::endl;
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
+    ElvenMeasure::report(result, io_time, solution_time);
     return 0;
 }

@@ -1,7 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <__numeric/transform_reduce.h>
+
+#include "elven_measure.h"
 
 enum instruction {
     left = 0,
@@ -49,7 +50,8 @@ auto parse_input(const char* filename) {
     return std::move(std::tuple(instructions, nodes));
 }
 
-size_t solve(const std::vector<instruction> &instructions, const node_maps &nodes) {
+size_t solve(const std::tuple<std::vector<instruction>, node_maps> &input) {
+    const auto [instructions, nodes] = input;
     size_t steps = 0;
     for (size_t current_node = START_NODE; current_node != END_NODE; ++steps) {
         current_node = nodes.at(current_node)[instructions[steps % instructions.size()]];
@@ -58,15 +60,8 @@ size_t solve(const std::vector<instruction> &instructions, const node_maps &node
 }
 
 int main(int _, char** argv) {
-    using namespace std::chrono;
-
-    auto [instructions, nodes] = parse_input(argv[1]);
-    const auto start {high_resolution_clock::now()};
-    const auto solution {solve(instructions, nodes)};
-    const auto end {high_resolution_clock::now()};
-    std::cout << solution << std::endl;
-    const duration<double> elapsed_seconds{end - start};
-    std::cout << elapsed_seconds.count() * 1000 << "ms" << std::endl;
-    std::cout << elapsed_seconds.count() * 1000000 << "µs" << std::endl;
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
+    ElvenMeasure::report(result, io_time, solution_time);
     return 0;
 }
