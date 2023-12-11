@@ -1,40 +1,46 @@
-#include <iostream>
 #include <numeric>
 
 #include "elven_io.h"
 #include "elven_measure.h"
 
-std::size_t solve(const ElvenIO::input_type &input) {
-    const std::array<std::string, 9> numbers = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
+const std::array<std::string, 9> numbers = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
 
+std::optional<std::size_t> is_number(const std::string &line, const int i) {
+    const char c = line[i];
+    if (isdigit(c)) {
+        return std::optional(c - '0');
+    }
+    if (c == 'o' || c == 't' || c == 'f' || c == 's' || c == 'e' || c == 'n') {
+        for (int j = 0 ; j < numbers.size(); j++) {
+            if (strncmp(&line[i], numbers[j].c_str(), numbers[j].length()) == 0) {
+                return std::optional(j + 1);
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+std::size_t find_high(const std::string &line) {
+    for (int i = 0 ; i < line.length(); ++i) {
+        if (const auto high = is_number(line, i); high.has_value()) { return high.value(); }
+    }
+    throw std::runtime_error("number not found");
+}
+
+std::size_t find_low(const std::string &line) {
+    for (int i = line.length() - 1 ; i >= 0; --i) {
+        if (const auto low = is_number(line, i); low.has_value()) { return low.value(); }
+    }
+    throw std::runtime_error("number not found");
+}
+
+std::size_t solve(const ElvenIO::input_type &input) {
     return std::transform_reduce(
         input.begin(),
         input.end(),
         0,
         std::plus(),
-        [=](auto line) {
-            // THIS IS AWFUL FIX
-            size_t high = -1;
-            size_t low = 0;
-            for ( int i = 0 ; i < line.length(); i++) {
-                int digit = -1;
-                if (isdigit(line[i])) {
-                    digit = line[i] - '0';
-                } else {
-                    for(int j = 0 ; j < numbers.size(); j++) {
-                        if (strncmp(&line[i], numbers[j].c_str(), numbers[j].length()) == 0) {
-                            digit = j + 1;
-                            break;
-                        }
-                    }
-                }
-                if (digit != -1) {
-                    high = high == -1 ? digit : high;
-                    low = digit;
-                }
-            }
-            return high * 10 + low;
-        }
+        [](auto line) { return find_high(line) * 10 + find_low(line); }
     );
 }
 
