@@ -32,7 +32,7 @@ auto parse_transformers(const ElvenIO::input_type &input) {
     for (int i = 3; i < input.size(); i += 2) {
         origin_set origins;
         origin_to_data_map origin_to_data;
-        for (; !input[i].empty(); ++i) {
+        for (; i < input.size() && !input[i].empty(); ++i) {
             std::stringstream stream;
             stream << input[i];
             long destination, origin, range;
