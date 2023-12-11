@@ -1,30 +1,32 @@
-#include <iostream>
+#include <sstream>
 #include <numeric>
-#include <regex>
 
 #include "elven_io.h"
 #include "elven_measure.h"
 
-
-auto get_max_color(const std::string &line, const std::regex &color_regex) {
-    int amount = 0;
-    auto color_begin = std::regex_iterator(line.begin(), line.end(), color_regex);
-    auto color_end = std::sregex_iterator();
-    for (std::sregex_iterator i = color_begin; i != color_end; ++i) {
-        amount = std::max(amount, std::stoi(i->str()));
-    }
-    return static_cast<size_t>(amount);
-}
-
 auto parse_input(const ElvenIO::input_type &input) {
-    std::vector<std::array<size_t, 3>> games;
+    std::vector<std::vector<size_t>> games;
 
-    const std::regex red_regex("(\\d+) r");
-    const std::regex green_regex("(\\d+) g");
-    const std::regex blue_regex("(\\d+) b");
-
-    for(const auto &line: input) {
-        std::array colors {get_max_color(line, red_regex), get_max_color(line, green_regex) ,get_max_color(line, blue_regex) };
+    for (const auto &line: input) {
+        std::stringstream stream;
+        std::string color;
+        std::size_t number;
+        stream << line;
+        stream >> color >> color;
+        std::vector<std::size_t> colors(3, 0);
+        while(stream >> number >> color) {
+            switch (color[0]) {
+                case 'r':
+                    colors[0] = std::max(colors[0], number);
+                break;
+                case 'g':
+                    colors[1] = std::max(colors[1], number);
+                break;
+                case 'b':
+                    colors[2] = std::max(colors[2], number);
+                break;
+            }
+        }
         games.emplace_back(colors);
     }
 
