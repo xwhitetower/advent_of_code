@@ -28,7 +28,7 @@ auto parse_seeds(const ElvenIO::input_type &input) {
 auto parse_transformers(const ElvenIO::input_type &input) {
     stage_list stages;
 
-    for (int i = 2; i < input.size();) {
+    for (int i = 3; i < input.size(); i += 2) {
         stage_data stage;
         for (; !input[i].empty(); ++i) {
             std::stringstream stream;
@@ -37,7 +37,6 @@ auto parse_transformers(const ElvenIO::input_type &input) {
             stream >> destination >> origin >> range;
             stage.emplace_back(origin, destination, range);
         }
-        ++i; // advance from empty line
         std::sort(stage.begin(), stage.end());
         stages.emplace_back(stage);
     }

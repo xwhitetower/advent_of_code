@@ -29,7 +29,7 @@ auto parse_seeds(const ElvenIO::input_type &input) {
 auto parse_transformers(const ElvenIO::input_type &input) {
     transformer_list transformers;
 
-    for (int i = 2; i < input.size();) {
+    for (int i = 3; i < input.size(); i += 2) {
         origin_set origins;
         origin_to_data_map origin_to_data;
         for (; !input[i].empty(); ++i) {
@@ -40,7 +40,6 @@ auto parse_transformers(const ElvenIO::input_type &input) {
             origins.emplace(origin);
             origin_to_data[origin] = std::tuple(destination - origin, range);
         }
-        ++i; // advance from empty line
         transformers.emplace_back(origins, origin_to_data);
     }
 
