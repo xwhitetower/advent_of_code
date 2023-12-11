@@ -1,7 +1,8 @@
 #include <iostream>
-#include <fstream>
+#include <sstream>
 #include <map>
 
+#include "elven_io.h"
 #include "elven_measure.h"
 
 typedef size_t card_value;
@@ -61,14 +62,15 @@ HandScore to_hand_score(const cards &hand) {
     }
 }
 
-auto parse_input(const char* filename) {
-    std::fstream file(filename);
+auto parse_input(const ElvenIO::input_type &input) {
     std::vector<play> plays;
 
-    for (auto i = std::istream_iterator<std::string>(file); i != std::istream_iterator<std::string>(); ++i) {
-        std::string hand = *i;
-        ++i;
-        bid_value bid = std::stol(*i);
+    for (const auto &line: input) {
+        std::stringstream stream;
+        stream << line;
+        std::string hand;
+        bid_value bid;
+        stream >> hand >> bid;
         cards parsed_hand;
         std::transform(
             hand.begin(), hand.end(),
@@ -81,8 +83,9 @@ auto parse_input(const char* filename) {
     return std::move(plays);
 }
 
-size_t solve(std::vector<play> &plays) {
-    std::sort(
+auto solve(const ElvenIO::input_type &input) {
+    auto plays = parse_input(input);
+    std::ranges::sort(
         plays.begin(), plays.end(),
         [](const auto &left, const auto &right) {
             auto [left_hand, left_score, left_bid] = left;
@@ -98,7 +101,7 @@ size_t solve(std::vector<play> &plays) {
 }
 
 int main(int _, char** argv) {
-    auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
     auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
     ElvenMeasure::report(result, io_time, solution_time);
     return 0;

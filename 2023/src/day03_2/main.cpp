@@ -1,23 +1,9 @@
 #include <iostream>
-#include <fstream>
-#include <numeric>
 
+#include "elven_io.h"
 #include "elven_measure.h"
 
 constexpr auto EMPTY = '.';
-
-auto parse_input(const char* filename) {
-    std::fstream file(filename);
-    std::vector<std::string> lines;
-
-    std::copy(
-        std::istream_iterator<std::string>(file),
-        std::istream_iterator<std::string>(),
-        std::back_inserter(lines)
-    );
-
-    return std::move(lines);
-}
 
 size_t parse_number(const std::vector<std::string> &schematic, const int x, const int y) {
     auto number = 0;
@@ -50,7 +36,7 @@ size_t gear_ratio(const std::vector<std::string> &schematic, const int x, const 
     return found == 2 ? ratio : 0;
 }
 
-size_t solve(const std::vector<std::string> &schematic) {
+size_t solve(const ElvenIO::input_type &schematic) {
     size_t sum = 0;
     for (int y = 0; y < schematic.size(); ++y) {
         for (int x = 0; x < schematic[y].size(); ++x) {
@@ -63,7 +49,7 @@ size_t solve(const std::vector<std::string> &schematic) {
 }
 
 int main(int _, char** argv) {
-    const auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
     auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
     ElvenMeasure::report(result, io_time, solution_time);
     return 0;

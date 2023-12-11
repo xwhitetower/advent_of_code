@@ -11,13 +11,12 @@ namespace ElvenIO {
 
     input_type inline read(const char *filename) {
         std::fstream file(filename);
-        input_type lines;
 
-        std::copy(
-            std::istream_iterator<std::string>(file),
-            std::istream_iterator<std::string>(),
-            std::back_inserter(lines)
-        );
+        std::string line;
+        input_type lines;
+        while (std::getline(file, line)) {
+            lines.emplace_back(line);
+        }
 
         return std::move(lines);
     }

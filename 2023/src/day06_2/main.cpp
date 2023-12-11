@@ -1,20 +1,15 @@
 #include <iostream>
-#include <fstream>
 #include <regex>
 
+#include "elven_io.h"
 #include "elven_measure.h"
 
 typedef std::tuple<size_t, size_t> race;
 
-auto parse_input(const char* filename) {
-    std::fstream file(filename);
+auto parse_input(const ElvenIO::input_type &input) {
 
-    std::string time_line;
-    std::string distance_line;
-    std::getline(file, time_line);
-    std::getline(file, distance_line);
-    time_line = time_line.substr(std::string("Time:").length());
-    distance_line = distance_line.substr(std::string("Distance::").length());
+    std::string time_line = input[0].substr(std::string("Time:").length());
+    std::string distance_line = input[1].substr(std::string("Distance::").length());
     time_line.erase(std::remove_if(time_line.begin(), time_line.end(), isspace), time_line.end());
     distance_line.erase(std::remove_if(distance_line.begin(), distance_line.end(), isspace), distance_line.end());
 
@@ -49,13 +44,13 @@ size_t search_max_win_position(const size_t &distance, const size_t &time) {
     return max_win;
 }
 
-size_t solve(const race &race_data) {
-    auto [time, distance] = race_data;
+auto solve(const ElvenIO::input_type &input) {
+    auto [time, distance] = parse_input(input);
     return search_max_win_position(distance, time) - search_min_win_position(distance, time) + 1;
 }
 
 int main(int _, char** argv) {
-    const auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
     auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
     ElvenMeasure::report(result, io_time, solution_time);
     return 0;

@@ -1,9 +1,8 @@
 #include <iostream>
 #include <sstream>
-#include <fstream>
 #include <regex>
-#include <set>
 
+#include "elven_io.h"
 #include "elven_measure.h"
 
 typedef std::tuple<long, long> seed_range;
@@ -12,37 +11,33 @@ typedef std::tuple<long, long, long> transformer_data;
 typedef std::vector<transformer_data> stage_data;
 typedef std::vector<stage_data> stage_list;
 
-auto parse_seeds(std::fstream &file) {
+auto parse_seeds(const ElvenIO::input_type &input) {
     seed_list seeds;
 
-    std::string line;
-    std::getline(file, line);
-
     std::regex number_regex("(\\d+)");
-    auto seed_begin = std::sregex_iterator(line.begin(), line.end(), number_regex);
+    auto seed_begin = std::sregex_iterator(input[0].begin(), input[0].end(), number_regex);
     auto seed_end = std::sregex_iterator();
     for (std::sregex_iterator i = seed_begin; i != seed_end;  ++i) {
         auto seed = std::stol(i->str());
         auto range = std::stol((++i)->str());
         seeds.emplace_back(seed, range);
     }
-    std::getline(file, line); // newline
     return std::move(seeds);
 }
 
-auto parse_transformers(std::fstream &file) {
+auto parse_transformers(const ElvenIO::input_type &input) {
     stage_list stages;
 
-    std::string line;
-    while (std::getline(file, line)) { // useless headers
+    for (int i = 2; i < input.size();) {
         stage_data stage;
-        for(std::getline(file, line); !line.empty(); std::getline(file, line)) {
+        for (; !input[i].empty(); ++i) {
             std::stringstream stream;
-            stream << line;
+            stream << input[i];
             long destination, origin, range;
             stream >> destination >> origin >> range;
             stage.emplace_back(origin, destination, range);
         }
+        ++i; // advance from empty line
         std::sort(stage.begin(), stage.end());
         stages.emplace_back(stage);
     }
@@ -50,10 +45,9 @@ auto parse_transformers(std::fstream &file) {
     return std::move(stages);
 }
 
-auto parse_input(const char* filename) {
-    std::fstream file(filename);
-    auto seeds = parse_seeds(file);
-    auto transformers = parse_transformers(file);
+auto parse_input(const ElvenIO::input_type &input) {
+    auto seeds = parse_seeds(input);
+    auto transformers = parse_transformers(input);
     return std::move(std::tuple(seeds, transformers));
 }
 
@@ -92,8 +86,8 @@ auto solve(const seed_range &seed, const stage_list &stages, const size_t stage_
     );
 }
 
-auto solve(const std::tuple<seed_list, stage_list> &input) {
-    const auto [seeds, stages] = input;
+auto solve(const ElvenIO::input_type &input) {
+    const auto [seeds, stages] = parse_input(input);
     auto min_location = std::numeric_limits<long>::max();
     for (const auto seed: seeds) {
         min_location = std::min(min_location, solve(seed, stages, 0, 0));
@@ -102,7 +96,7 @@ auto solve(const std::tuple<seed_list, stage_list> &input) {
 }
 
 int main(int _, char** argv) {
-    const auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
     auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
     ElvenMeasure::report(result, io_time, solution_time);
     return 0;

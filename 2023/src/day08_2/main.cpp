@@ -1,8 +1,8 @@
 #include <iostream>
-#include <fstream>
 #include <map>
 #include <numeric>
 
+#include "elven_io.h"
 #include "elven_measure.h"
 
 enum instruction {
@@ -25,16 +25,13 @@ auto parse_instructions(const std::string &line) {
     return instructions;
 }
 
-auto parse_input(const char* filename) {
-    std::fstream file(filename);
-    std::string line;
-    std::getline(file, line);
-    auto instructions = parse_instructions(line);
-    std::getline(file, line);
+auto parse_input(const ElvenIO::input_type &input) {
+    auto instructions = parse_instructions(input[0]);
 
     node_maps nodes;
     std::vector<node_id> start_nodes;
-    while (std::getline(file, line)) {
+    for (int i = 2; i < input.size(); ++i) {
+        const auto line = input[i];
         const node_id current_node = line.substr(0, 3);
         if (current_node.back() == START_MARKER) { start_nodes.push_back(current_node); }
         nodes[current_node] = node{line.substr(7, 3), line.substr(12, 3)};
@@ -52,8 +49,8 @@ auto solve_single(const node_id &start_node, const size_t start_steps, const std
     return steps;
 }
 
-size_t solve(const std::tuple<std::vector<instruction>, std::vector<node_id>, node_maps> &input) {
-    const auto [instructions, start_nodes, nodes] = input;
+auto solve(const ElvenIO::input_type &input) {
+    const auto [instructions, start_nodes, nodes] = parse_input(input);
     std::vector<size_t> cycles;
     std::ranges::transform(
         start_nodes.begin(), start_nodes.end(),
@@ -70,7 +67,7 @@ size_t solve(const std::tuple<std::vector<instruction>, std::vector<node_id>, no
 }
 
 int main(int _, char** argv) {
-    const auto [input, io_time] = ElvenMeasure::execute([=]{ return parse_input(argv[1]); });
+    const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
     auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
     ElvenMeasure::report(result, io_time, solution_time);
     return 0;
