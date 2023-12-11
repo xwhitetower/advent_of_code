@@ -1,5 +1,8 @@
 #ifndef ELVEN_UTILS_H
 #define ELVEN_UTILS_H
+#include <__ranges/filter_view.h>
+#include <__ranges/transform_view.h>
+#include <__ranges/views.h>
 
 namespace ElvenUtils {
     typedef size_t X;
@@ -20,6 +23,10 @@ namespace ElvenUtils {
         [[nodiscard]] bool is_not(const X &x, const Y &y) const {
             return !is(x, y);
         }
+        [[nodiscard]] std::size_t manhattan_distance(const Point &point) const {
+            return std::max(point.x, x) - std::min(point.x, x) + std::max(point.y, y) - std::min(point.y, y);
+        }
+
 
 
         bool operator<(const Point& other) const {
@@ -65,6 +72,15 @@ namespace ElvenUtils {
                 }
             }
             throw std::runtime_error("No start posion found");
+        }
+        [[nodiscard]] std::vector<Point> find_all(const char element) const {
+            std::vector<Point> found;
+            for (auto y = 0 ; y < y_size(); ++y) {
+                for (auto x = 0 ; x < x_size(); ++x) {
+                    if (at(x, y) == element) { found.emplace_back(x, y); }
+                }
+            }
+            return found;
         }
 
         [[nodiscard]] size_t x_size() const { return map.front().size(); }
