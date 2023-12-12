@@ -1,6 +1,5 @@
 #include <iostream>
 #include <sstream>
-#include <regex>
 
 #include "elven_io.h"
 #include "elven_measure.h"
@@ -14,14 +13,12 @@ typedef std::vector<stage_data> stage_list;
 auto parse_seeds(const ElvenIO::input_type &input) {
     seed_list seeds;
 
-    std::regex number_regex("(\\d+)");
-    auto seed_begin = std::sregex_iterator(input[0].begin(), input[0].end(), number_regex);
-    auto seed_end = std::sregex_iterator();
-    for (std::sregex_iterator i = seed_begin; i != seed_end;  ++i) {
-        auto seed = std::stol(i->str());
-        auto range = std::stol((++i)->str());
-        seeds.emplace_back(seed, range);
-    }
+    std::stringstream stream;
+    stream << input[0];
+    std::string header;
+    stream >> header;
+    long seed_start, count;
+    while (stream >> seed_start >> count) { seeds.emplace_back(seed_start, count);  }
     return std::move(seeds);
 }
 

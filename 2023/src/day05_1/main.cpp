@@ -1,6 +1,5 @@
 #include <iostream>
 #include <sstream>
-#include <regex>
 #include <set>
 #include <map>
 
@@ -17,12 +16,12 @@ typedef std::vector<transformer_data> transformer_list;
 auto parse_seeds(const ElvenIO::input_type &input) {
     seed_list seeds;
 
-    std::regex number_regex("(\\d+)");
-    auto seed_begin = std::sregex_iterator(input[0].begin(), input[0].end(), number_regex);
-    auto seed_end = std::sregex_iterator();
-    for (std::sregex_iterator i = seed_begin; i != seed_end;  ++i) {
-        seeds.emplace_back(std::stol(i->str()));
-    }
+    std::stringstream stream;
+    stream << input[0];
+    std::string header;
+    stream >> header;
+    long seed;
+    while (stream >> seed) { seeds.emplace_back(seed);  }
     return std::move(seeds);
 }
 
