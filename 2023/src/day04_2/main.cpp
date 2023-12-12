@@ -1,45 +1,43 @@
-#include <iostream>
-#include <regex>
 #include <set>
-#include <__numeric/reduce.h>
+#include <sstream>
+#include <numeric>
 
 #include "elven_io.h"
 #include "elven_measure.h"
 
 typedef std::vector<std::tuple<std::set<int>, std::vector<int>>> cards_type;
 
-auto parse_winners(const std::string &line) {
-    std::regex number_regex("(\\d+)");
-    auto colon_pos = line.find(':');
-    auto pipe_pos = line.find('|');
-    auto winner_begin = std::regex_iterator(line.begin() + colon_pos, line.begin() + pipe_pos, number_regex);
-    auto winner_end = std::sregex_iterator();
+void skip_header(std::stringstream &stream) {
+    std::string card_label;
+    std::string game_number;
+    stream >> card_label >> game_number;
+}
+
+auto parse_winners(std::stringstream &stream) {
     std::set<int> winners;
-    for (std::sregex_iterator i = winner_begin; i != winner_end; ++i) {
-        winners.emplace(std::stoi(i->str()));
+    std::string winner;
+    while (stream >> winner && winner != "|") {
+        winners.emplace(std::stoi(winner));
     }
     return std::move(winners);
 }
 
-auto parse_card(const std::string &line) {
-    std::regex number_regex("(\\d+)");
-    auto pipe_pos = line.find('|');
-    auto winner_begin = std::regex_iterator(line.begin() + pipe_pos, line.end(), number_regex);
-    auto winner_end = std::sregex_iterator();
-    std::vector<int> card;
-    for (std::sregex_iterator i = winner_begin; i != winner_end; ++i) {
-        card.emplace_back(std::stoi(i->str()));
+auto parse_cards(std::stringstream &stream) {
+    std::vector<int> cards;
+    int card;
+    while (stream >> card) {
+        cards.emplace_back(card);
     }
-    return std::move(card);
+    return std::move(cards);
 }
 
 auto parse_input(const ElvenIO::input_type &input) {
     cards_type cards;
-
-    std::regex winner_regex(": ((\\d+))+ |");
-    std::regex elf_card_regex("| ((\\d+))+");
     for (const auto &line: input) {
-        cards.emplace_back(parse_winners(line), parse_card(line));
+        std::stringstream stream;
+        stream << line;
+        skip_header(stream);
+        cards.emplace_back(parse_winners(stream), parse_cards(stream));
     }
 
     return std::move(cards);
