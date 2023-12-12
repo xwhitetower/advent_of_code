@@ -1,6 +1,3 @@
-#include <iostream>
-#include <regex>
-
 #include "elven_io.h"
 #include "elven_measure.h"
 
@@ -19,8 +16,7 @@ auto parse_input(const ElvenIO::input_type &input) {
 size_t search_min_win_position(const size_t &distance, const size_t &time) {
     size_t min_win = distance;
     for (size_t high = time, low = 0, mid = (high + low) / 2; low <= high; mid = (high + low) / 2.0) {
-        const auto run_distance = (time - mid) * mid;
-        if (run_distance > distance) {
+        if (const auto run_distance = (time - mid) * mid; run_distance > distance) {
             min_win = mid;
             high = high == mid ? mid - 1 : mid;
         } else {
@@ -33,8 +29,7 @@ size_t search_min_win_position(const size_t &distance, const size_t &time) {
 size_t search_max_win_position(const size_t &distance, const size_t &time) {
     size_t max_win = 0;
     for (size_t high = time, low = 0, mid = (high + low) / 2; low <= high; mid = (high + low) / 2.0) {
-        const auto run_distance = (time - mid) * mid;
-        if (run_distance > distance) {
+        if (const auto run_distance = (time - mid) * mid; run_distance > distance) {
             max_win = mid;
             low = low == mid ? mid + 1 : mid;
         } else {

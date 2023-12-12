@@ -1,5 +1,5 @@
-#include <regex>
-#include <__numeric/transform_reduce.h>
+#include <sstream>
+#include <numeric>
 
 #include "elven_io.h"
 #include "elven_measure.h"
@@ -9,22 +9,23 @@ typedef std::tuple<size_t, size_t> race;
 auto parse_input(const ElvenIO::input_type &input) {
     std::vector<race> races;
 
-    std::regex number_regex("(\\d+)");
-    auto time_it = std::sregex_iterator(input[0].begin(), input[0].end(), number_regex);
-    auto distance_it = std::sregex_iterator(input[1].begin(), input[1].end(), number_regex);
-    auto regex_end = std::sregex_iterator();
-    for (std::sregex_iterator time = time_it, distance = distance_it; time != regex_end; ++time, ++distance) {
-        races.emplace_back(std::stol(time->str()), std::stol(distance->str()));
-    }
+    std::stringstream timestream;
+    timestream << input[0];
+    std::stringstream distancestream;
+    distancestream << input[1];
+    std::string header1, header2;
+    timestream >> header1;
+    distancestream >> header2;
 
+    size_t time, distance;
+    while (timestream >> time && distancestream >> distance) { races.emplace_back(time, distance); }
     return races;
 }
 
 size_t search_min_win_position(const size_t &distance, const size_t &time) {
     size_t min_win = distance;
     for (size_t high = time, low = 0, mid = (high + low) / 2; low <= high; mid = (high + low) / 2.0) {
-        const auto run_distance = (time - mid) * mid;
-        if (run_distance > distance) {
+        if (const auto run_distance = (time - mid) * mid; run_distance > distance) {
             min_win = mid;
             high = high == mid ? mid - 1 : mid;
         } else {
@@ -37,8 +38,7 @@ size_t search_min_win_position(const size_t &distance, const size_t &time) {
 size_t search_max_win_position(const size_t &distance, const size_t &time) {
     size_t max_win = 0;
     for (size_t high = time, low = 0, mid = (high + low) / 2; low <= high; mid = (high + low) / 2.0) {
-        const auto run_distance = (time - mid) * mid;
-        if (run_distance > distance) {
+        if (const auto run_distance = (time - mid) * mid; run_distance > distance) {
             max_win = mid;
             low = low == mid ? mid + 1 : mid;
         } else {
