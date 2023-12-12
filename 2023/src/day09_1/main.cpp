@@ -1,5 +1,5 @@
+#include <sstream>
 #include <numeric>
-#include <regex>
 
 #include "elven_io.h"
 #include "elven_measure.h"
@@ -10,14 +10,12 @@ typedef std::vector<sequence_type> input_type;
 auto parse_input(const ElvenIO::input_type &input) {
     input_type sequences;
 
-    const std::regex number_regex("(-*\\d+)");
-    const auto end = std::sregex_iterator();
     for (const auto &line: input) {
-        auto begin = std::sregex_iterator(line.begin(), line.end(), number_regex);
+        std::stringstream stream;
+        stream << line;
+        long long value;
         sequence_type sequence;
-        for (std::sregex_iterator i = begin; i != end;  ++i) {
-            sequence.emplace_back(std::stol(i->str()));
-        }
+        while (stream >> value) { sequence.emplace_back(value); }
         sequences.emplace_back(sequence);
     }
 
