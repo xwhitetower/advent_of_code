@@ -44,6 +44,8 @@ namespace ElvenUtils {
 
     class Map {
     public:
+        static constexpr char EMPTY = '.';
+        static constexpr char BLOCKED = '#';
         std::vector<std::vector<char>> map;
 
         explicit Map(const std::vector<std::string> &map) {

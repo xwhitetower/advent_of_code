@@ -15,8 +15,18 @@ foreach(day RANGE 1 11)
     endif()
     add_executable(day${day_prefix}${day}_1 src/day${day_prefix}${day}_1/main.cpp)
     add_executable(day${day_prefix}${day}_2 src/day${day_prefix}${day}_2/main.cpp)
-    target_link_libraries(day${day_prefix}${day}_1 PUBLIC tbb)
-    target_link_libraries(day${day_prefix}${day}_2 PUBLIC tbb)
+    install(TARGETS day${day_prefix}${day}_1 DESTINATION "${CMAKE_SOURCE_DIR}/bin")
+    install(TARGETS day${day_prefix}${day}_2 DESTINATION "${CMAKE_SOURCE_DIR}/bin")
+endforeach()
+
+
+add_executable(day12_1 src/day12_1/main.cpp)
+install(TARGETS day12_1 DESTINATION "${CMAKE_SOURCE_DIR}/bin")
+
+# temporary until day 12 is fully done
+foreach(day RANGE 13 13)
+    add_executable(day${day_prefix}${day}_1 src/day${day_prefix}${day}_1/main.cpp)
+    add_executable(day${day_prefix}${day}_2 src/day${day_prefix}${day}_2/main.cpp)
     install(TARGETS day${day_prefix}${day}_1 DESTINATION "${CMAKE_SOURCE_DIR}/bin")
     install(TARGETS day${day_prefix}${day}_2 DESTINATION "${CMAKE_SOURCE_DIR}/bin")
 endforeach()
