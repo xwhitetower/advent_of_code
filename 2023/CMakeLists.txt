@@ -22,8 +22,6 @@ endforeach()
 
 add_executable(day12_1 src/day12_1/main.cpp)
 install(TARGETS day12_1 DESTINATION "${CMAKE_SOURCE_DIR}/bin")
-add_executable(day12_2 src/day12_2/main.cpp)
-install(TARGETS day12_2 DESTINATION "${CMAKE_SOURCE_DIR}/bin")
 
 # temporary until day 12 is fully done
 foreach(day RANGE 13 16)
