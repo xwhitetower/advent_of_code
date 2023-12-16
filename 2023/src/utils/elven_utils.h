@@ -1,12 +1,10 @@
 #ifndef ELVEN_UTILS_H
 #define ELVEN_UTILS_H
 #include <__ranges/filter_view.h>
-#include <__ranges/transform_view.h>
-#include <__ranges/views.h>
 
 namespace ElvenUtils {
-    typedef size_t X;
-    typedef size_t Y;
+    typedef long X;
+    typedef long Y;
 
     struct Point {
         X x;
@@ -38,6 +36,11 @@ namespace ElvenUtils {
         bool operator!=(const Point& other) const {
             return !(*this == other);
         }
+        Point& operator+=(const Point& other) {
+            this->x += other.x;
+            this->y += other.y;
+            return *this;
+        }
         friend std::ostream& operator<<(std::ostream& os, const Point& point);
     };
 
@@ -68,9 +71,9 @@ namespace ElvenUtils {
         Map(const Map& other) = default;
 
         [[nodiscard]] Point find(const char element) const {
-            for (size_t i = 0; i < map.size(); ++i) {
+            for (long i = 0; i < map.size(); ++i) {
                 if (auto it = std::ranges::find(map[i].begin(), map[i].end(), element); it != map[i].end()) {
-                    return Point{static_cast<X>(it - map[i].begin()), i};
+                    return Point{it - map[i].begin(), i};
                 }
             }
             throw std::runtime_error("No start posion found");
@@ -88,8 +91,9 @@ namespace ElvenUtils {
         [[nodiscard]] size_t x_size() const { return map.front().size(); }
         [[nodiscard]] size_t y_size() const { return map.size(); }
 
-        [[nodiscard]] size_t in_x_boundary(const X &x) const { return x < x_size(); }
-        [[nodiscard]] size_t in_y_boundary(const Y &y) const { return y < y_size(); }
+        [[nodiscard]] bool in_x_boundary(const X &x) const { return x < x_size(); }
+        [[nodiscard]] bool in_y_boundary(const Y &y) const { return y < y_size(); }
+        [[nodiscard]] bool in_boundary(const Point &point) const { return in_x_boundary(point.x) && in_y_boundary(point.y); }
 
         [[nodiscard]] char at(const X &x, const Y &y) const {  return map[y][x]; }
         [[nodiscard]] char at(const Point& point) const { return at(point.x, point.y);  }
