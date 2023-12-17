@@ -41,6 +41,9 @@ namespace ElvenUtils {
             this->y += other.y;
             return *this;
         }
+        Point operator+(const Point& other) const {
+            return {x + other.x, y + other.y};
+        }
         friend std::ostream& operator<<(std::ostream& os, const Point& point);
     };
 
