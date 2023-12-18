@@ -1,6 +1,8 @@
 #ifndef ELVEN_UTILS_H
 #define ELVEN_UTILS_H
-#include <__ranges/filter_view.h>
+
+#include <set>
+#include <deque>
 
 namespace ElvenUtils {
     typedef long X;
@@ -12,9 +14,13 @@ namespace ElvenUtils {
 
         Point(const X x, const Y y) : x(x), y(y) {}
         [[nodiscard]] Y north() const { return y - 1; }
+        [[nodiscard]] Y up() const { return north(); }
         [[nodiscard]] Y south() const { return y + 1; }
+        [[nodiscard]] Y down() const { return south(); }
         [[nodiscard]] X east() const { return x + 1; }
+        [[nodiscard]] X right() const { return east(); }
         [[nodiscard]] X west() const { return x - 1; }
+        [[nodiscard]] X left() const { return west(); }
         [[nodiscard]] bool is(const X &x, const Y &y) const {
             return this->x == x && this->y == y;
         }
@@ -52,16 +58,20 @@ namespace ElvenUtils {
     public:
         static constexpr char EMPTY = '.';
         static constexpr char BLOCKED = '#';
-        std::vector<std::vector<char>> map;
+        std::deque<std::deque<char>> map;
+
+        explicit Map(const std::size_t x_dimension, const std::size_t y_dimension) {
+            for (int y = 0; y < y_dimension; ++y) {
+                map.emplace_back(x_dimension, EMPTY);
+            }
+        }
 
         explicit Map(const std::vector<std::string> &map) {
-            this->map.reserve(map.size());
             std::ranges::transform(
                 map.begin(), map.end(),
                 std::back_inserter(this->map),
                 [](auto &line) {
-                    std::vector<char> row;
-                    row.reserve(line.length());
+                    std::deque<char> row;
                     std::copy(
                         line.begin(), line.end(),
                         std::back_inserter(row)
@@ -70,7 +80,21 @@ namespace ElvenUtils {
                 }
             );
         }
-        explicit Map(const std::vector<std::vector<char>> &map) : map(map) {}
+        explicit Map(const std::vector<std::vector<char>> &map) {
+            std::ranges::transform(
+                map.begin(), map.end(),
+                std::back_inserter(this->map),
+                [](auto &line) {
+                    std::deque<char> row;
+                    std::copy(
+                        line.begin(), line.end(),
+                        std::back_inserter(row)
+                    );
+                    return std::move(row);
+                }
+            );
+        }
+
         Map(const Map& other) = default;
 
         [[nodiscard]] Point find(const char element) const {
@@ -104,6 +128,66 @@ namespace ElvenUtils {
 
         void set(const X &x, const Y &y, const char &value) { map[y][x] = value; }
         void set(const Point& point, const char &value) { set(point.x, point.y, value); }
+
+        void expand_up() {
+            map.emplace_front(x_size(), EMPTY);
+        }
+        void expand_down() {
+            map.emplace_back(x_size(), EMPTY);
+        }
+        void expand_right() {
+            for (auto& row : map) {
+                row.emplace_back(EMPTY);
+            }
+        }
+        void expand_left() {
+            for (auto& row : map) {
+                row.emplace_front(EMPTY);
+            }
+        }
+
+        void paint_exterior(const char paint) {
+            expand_up();
+            expand_down();
+            expand_right();
+            expand_left();
+            std::set<Point> visited_cells;
+            std::deque<Point> explore_cells;
+            explore_cells.emplace_back(0, 0);
+            set(0, 0, paint);
+            while (!explore_cells.empty()) {
+                const auto point = explore_cells.front();
+                explore_cells.pop_front();
+                if (const auto north = Point(point.x, point.north());
+                    in_y_boundary(north.y) && at(north) == EMPTY && !visited_cells.contains(north)
+                ) {
+                    explore_cells.push_back(north);
+                    set(point.x, point.north(), paint);
+                    visited_cells.insert(north);
+                }
+                if (const auto south = Point(point.x, point.south());
+                    in_y_boundary(south.y) && at(south) == EMPTY && !visited_cells.contains(south)
+                ) {
+                    explore_cells.push_back(south);
+                    set(point.x, point.south(), paint);
+                    visited_cells.insert(south);
+                }
+                if (const auto east = Point(point.east(), point.y);
+                    in_x_boundary(east.x) && at(east) == EMPTY && !visited_cells.contains(east)
+                ) {
+                    explore_cells.push_back(east);
+                    set(point.east(), point.y, paint);
+                    visited_cells.insert(east);
+                }
+                if (const auto west = Point(point.west(), point.y);
+                    in_x_boundary(west.x) && at(west) == EMPTY && !visited_cells.contains(west)
+                ) {
+                    explore_cells.push_back(west);
+                    set(point.west(), point.y, paint);
+                    visited_cells.insert(west);
+                }
+            }
+        }
 
         void print() const {
             std::cout << *this << std::endl;

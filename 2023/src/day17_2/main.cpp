@@ -164,7 +164,7 @@ std::size_t solve(const ElvenIO::input_type& input) {
 
 int main(int _, char** argv) {
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
-    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 1);
+    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 3);
     ElvenMeasure::report(result, io_time, solution_time);
     return 0;
 }
