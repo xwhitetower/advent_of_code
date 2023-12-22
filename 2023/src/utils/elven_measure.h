@@ -50,6 +50,30 @@ namespace ElvenMeasure {
         return std::to_string(time_ns / 1_day) + " day(s)";
     }
 
+    class Reporter {
+        typedef std::chrono::duration<long long, std::ratio<1, 1000000000>> Time;
+        Time io_time;
+        std::vector<std::tuple<int, std::size_t, Time>> reports;
+
+    public:
+        void add_io_report(const Time execution_time) {
+            io_time = execution_time;
+        }
+        void add_report(const int part, const std::size_t solution, const Time execution_time) {
+            reports.emplace_back(part, solution, execution_time);
+        }
+
+        void report() {
+            std::cout << "I/O   : " << cast_time(io_time) << std::endl;
+            for(const auto& [part, solution, execution_time]: reports) {
+                std::cout << "Part" << part << " : " << cast_time(execution_time) << std::endl;
+            }
+            for(const auto& [part, solution, execution_time]: reports) {
+                std::cout << "Part" << part << " Solution: " << solution << std::endl;
+            }
+        }
+    };
+
     template <class TRes1, class TIoTime, class TRes1Tme>
     auto report(const TRes1 & result, const TIoTime & io_time, const TRes1Tme & solve_time) {
         std::cout << "I/O   : " << cast_time(io_time) << std::endl;
