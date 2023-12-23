@@ -27,8 +27,8 @@ auto parse_line(const std::string& line) {
     return std::make_tuple(direction, count);
 }
 
-void execute(const std::string& line, std::vector<Point>& path, ElvenUtils::Point& position) {
-    if (const auto [direction, count] = parse_line(line); direction == UP) {
+void execute(const char direction, const int count, std::vector<Point>& path, ElvenUtils::Point& position) {
+    if (direction == UP) {
         position.y -= count;
         path.push_back(position);
     } else if (direction == DOWN) {
@@ -55,19 +55,61 @@ std::size_t shoelace_and_picks(const std::vector<Point>& path) {
     return std::abs(area) / 2 + perifery  / 2 + 1;
 }
 
-std::size_t solve(const ElvenIO::input_type &input) {
+std::size_t part1(const ElvenIO::input_type &input) {
     auto position = Point(0, 0);
     std::vector<Point> path;
     path.push_back(position);
     for(const auto &line: input) {
-        execute(line, path, position);
+        auto [direction, count] = parse_line(line);
+        execute(direction, count, path, position);
+    }
+    return shoelace_and_picks(path);
+}
+
+auto hex_to_int(const std::string& hex_string) {
+    unsigned long parsed_value;
+    std::stringstream stream;
+    stream << std::hex << hex_string;
+    stream >> parsed_value;
+    return parsed_value;
+}
+
+auto digit_to_direction(const char digit) {
+    if (digit == '0') { return RIGHT; }
+    if (digit == '1') { return DOWN; }
+    if (digit == '2') { return LEFT; }
+    if (digit == '3') { return UP; }
+}
+
+auto parse_color_line(const std::string& line) {
+    std::stringstream stream;
+    stream << line;
+    char fake_direction;
+    int fake_count;
+    std::string color;
+    stream >> fake_direction >> fake_count >> color;
+    return std::make_tuple(digit_to_direction(color[color.size() -2]), hex_to_int(color.substr(2, color.size() -4)));
+}
+
+std::size_t part2(const ElvenIO::input_type &input) {
+    auto position = Point(0, 0);
+    std::vector<Point> path;
+    path.push_back(position);
+    for(const auto &line: input) {
+        auto [direction, count] = parse_color_line(line);
+        execute(direction, count, path, position);
     }
     return shoelace_and_picks(path);
 }
 
 int main(int _, char** argv) {
+    ElvenMeasure::Reporter reporter;
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
-    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 1);
-    ElvenMeasure::report(result, io_time, solution_time);
+    reporter.add_io_report(io_time);
+    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 1);
+    reporter.add_report(1, result1, solution1_time);
+    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 1);
+    reporter.add_report(2, result2, solution2_time);
+    reporter.report();
     return 0;
 }
