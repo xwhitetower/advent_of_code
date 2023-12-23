@@ -1,4 +1,5 @@
 #include <sstream>
+#include <numeric>
 
 #include "elven_io.h"
 #include "elven_measure.h"
@@ -26,6 +27,16 @@ std::size_t elf_hash(const std::string &sequence) {
         hash = (hash + c) * 17 % 256;
     }
     return hash;
+}
+
+std::size_t part1(const ElvenIO::input_type &input) {
+    const auto sequences = parse_input(input);
+    return std::transform_reduce(
+        sequences.begin(), sequences.end(),
+        0,
+        std::plus(),
+        [](const auto &sequence) { return elf_hash(sequence); }
+    );
 }
 
 void execute_sequences(const Sequences &sequences, Boxes &boxes) {
@@ -61,7 +72,7 @@ std::size_t focusing_power(const Boxes &boxes) {
     return power;
 }
 
-std::size_t solve(const ElvenIO::input_type &input) {
+std::size_t part2(const ElvenIO::input_type &input) {
     const auto sequences = parse_input(input);
     Boxes boxes;
     execute_sequences(sequences, boxes);
@@ -69,8 +80,13 @@ std::size_t solve(const ElvenIO::input_type &input) {
 }
 
 int main(int _, char** argv) {
+    ElvenMeasure::Reporter reporter;
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
-    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
-    ElvenMeasure::report(result, io_time, solution_time);
+    reporter.add_io_report(io_time);
+    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 10);
+    reporter.add_report(1, result1, solution1_time);
+    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 10);
+    reporter.add_report(2, result2, solution2_time);
+    reporter.report();
     return 0;
 }
