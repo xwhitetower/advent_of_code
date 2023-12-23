@@ -33,7 +33,7 @@ endforeach()
 
 
 # New format
-foreach(day RANGE 19 19)
+foreach(day RANGE 19 20)
     add_executable(day${day_prefix}${day} src/day${day_prefix}${day}/main.cpp)
     install(TARGETS day${day_prefix}${day} DESTINATION "${CMAKE_SOURCE_DIR}/bin")
 endforeach()
