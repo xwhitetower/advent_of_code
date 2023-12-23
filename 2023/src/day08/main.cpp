@@ -48,7 +48,17 @@ auto solve_single(const node_id &start_node, const size_t start_steps, const std
     return steps;
 }
 
-auto solve(const ElvenIO::input_type &input) {
+auto part1(const ElvenIO::input_type &input) {
+    // Join with part2 eventually.
+    const auto [instructions, _, nodes] = parse_input(input);
+    size_t steps = 0;
+    for (std::string current_node = "AAA"; current_node != "ZZZ"; ++steps) {
+        current_node = nodes.at(current_node)[instructions[steps % instructions.size()]];
+    }
+    return steps;
+}
+
+auto part2(const ElvenIO::input_type &input) {
     const auto [instructions, start_nodes, nodes] = parse_input(input);
     std::vector<size_t> cycles;
     std::ranges::transform(
@@ -66,8 +76,13 @@ auto solve(const ElvenIO::input_type &input) {
 }
 
 int main(int _, char** argv) {
+    ElvenMeasure::Reporter reporter;
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
-    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
-    ElvenMeasure::report(result, io_time, solution_time);
+    reporter.add_io_report(io_time);
+    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 10);
+    reporter.add_report(1, result1, solution1_time);
+    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 10);
+    reporter.add_report(2, result2, solution2_time);
+    reporter.report();
     return 0;
 }
