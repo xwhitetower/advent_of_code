@@ -151,7 +151,6 @@ void paint_outside_cells(ElvenUtils::Map &map) {
     }
 }
 
-
 ElvenUtils::Map contract_map(const ElvenUtils::Map &map) {
     std::vector<std::vector<char>> contracted_map;
     contracted_map.reserve(map.y_size() / 2 - 1);
@@ -191,15 +190,37 @@ size_t count_trapped_cells(const Point &start_position, const ElvenUtils::Map &m
     );
 }
 
-std::size_t solve(const ElvenIO::input_type &input) {
+Distance farthest_loop_distance(const Point &start_position, const ElvenUtils::Map &map) {
+    ElvenUtils::Map painted_map(map);
+    std::deque<PipePath> pipes_to_explore;
+    explore(start_position, start_position, 0, map, pipes_to_explore, painted_map);
+    while (std::get<0>(pipes_to_explore.front()) != std::get<0>(pipes_to_explore.back())) {
+        auto [current_pipe, previous_pipe, distance] = pipes_to_explore.front();
+        pipes_to_explore.pop_front();
+        explore(current_pipe, previous_pipe, distance, map, pipes_to_explore, painted_map);
+    }
+    return std::min(std::get<2>(pipes_to_explore.front()), std::get<2>(pipes_to_explore.back()));
+}
+
+std::size_t part1(const ElvenIO::input_type &input) {
+    const ElvenUtils::Map map(input);
+    return farthest_loop_distance(map.find(START_MARKER), map);
+}
+
+std::size_t part2(const ElvenIO::input_type &input) {
     const ElvenUtils::Map map(input);
     const auto expanded_map = expand_map(map);
     return count_trapped_cells(expanded_map.find(START_MARKER), expanded_map);
 }
 
 int main(int _, char** argv) {
+    ElvenMeasure::Reporter reporter;
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
-    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
-    ElvenMeasure::report(result, io_time, solution_time);
+    reporter.add_io_report(io_time);
+    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 10);
+    reporter.add_report(1, result1, solution1_time);
+    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 10);
+    reporter.add_report(2, result2, solution2_time);
+    reporter.report();
     return 0;
 }
