@@ -7,20 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fexperimental-library")
 
 include_directories(src/utils)
 
-foreach(day RANGE 1 2)
-    if(${day} LESS 10)
-        set(day_prefix 0)
-    else()
-        set(day_prefix "")
-    endif()
-    add_executable(day${day_prefix}${day}_1 src/day${day_prefix}${day}_1/main.cpp)
-    add_executable(day${day_prefix}${day}_2 src/day${day_prefix}${day}_2/main.cpp)
-    install(TARGETS day${day_prefix}${day}_1 DESTINATION "${CMAKE_SOURCE_DIR}/bin")
-    install(TARGETS day${day_prefix}${day}_2 DESTINATION "${CMAKE_SOURCE_DIR}/bin")
-endforeach()
-
-# New format
-foreach(day RANGE 2 20)
+foreach(day RANGE 1 20)
     if(${day} LESS 10)
         set(day_prefix 0)
     else()

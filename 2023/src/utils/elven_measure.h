@@ -73,12 +73,5 @@ namespace ElvenMeasure {
             }
         }
     };
-
-    template <class TRes1, class TIoTime, class TRes1Tme>
-    auto report(const TRes1 & result, const TIoTime & io_time, const TRes1Tme & solve_time) {
-        std::cout << "I/O   : " << cast_time(io_time) << std::endl;
-        std::cout << "Solve : " << cast_time(solve_time) << std::endl;
-        std::cout << "Solution: " << result << std::endl;
-    }
 }
 #endif
