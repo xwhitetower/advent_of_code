@@ -48,7 +48,7 @@ size_t search_max_win_position(const size_t &distance, const size_t &time) {
     return max_win;
 }
 
-auto solve(const ElvenIO::input_type &input) {
+auto part1(const ElvenIO::input_type &input) {
     const auto races = parse_input(input);
     return std::transform_reduce(
         races.begin(),
@@ -62,9 +62,28 @@ auto solve(const ElvenIO::input_type &input) {
     );
 }
 
+auto parse_input_as_single_value(const ElvenIO::input_type &input) {
+    std::string time_line = input[0].substr(std::string("Time:").length());
+    std::string distance_line = input[1].substr(std::string("Distance::").length());
+    time_line.erase(std::remove_if(time_line.begin(), time_line.end(), isspace), time_line.end());
+    distance_line.erase(std::remove_if(distance_line.begin(), distance_line.end(), isspace), distance_line.end());
+
+    return race(std::stol(time_line), std::stol(distance_line));
+}
+
+auto part2(const ElvenIO::input_type &input) {
+    auto [time, distance] = parse_input_as_single_value(input);
+    return search_max_win_position(distance, time) - search_min_win_position(distance, time) + 1;
+}
+
 int main(int _, char** argv) {
+    ElvenMeasure::Reporter reporter;
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
-    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
-    ElvenMeasure::report(result, io_time, solution_time);
+    reporter.add_io_report(io_time);
+    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 10);
+    reporter.add_report(1, result1, solution1_time);
+    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 10);
+    reporter.add_report(2, result2, solution2_time);
+    reporter.report();
     return 0;
 }
