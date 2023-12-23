@@ -19,21 +19,21 @@ typedef std::array<card_value, 5> cards;
 typedef std::tuple<cards, HandScore, bid_value> play;
 
 
-card_value to_card_value(const char &c) {
+card_value to_card_value(const char &c, const bool allow_jokers) {
     switch(c) {
         case 'A': return 14;
         case 'K': return 13;
         case 'Q': return 12;
-        case 'J': return 0;
+        case 'J': return allow_jokers ? 0 : 11;
         case 'T': return 10;
         default: return c - '0';
     }
 }
 
-HandScore to_hand_score(const cards &hand) {
+HandScore to_hand_score(const cards &hand, const bool allow_jokers) {
     std::map<card_value, uint8_t> tally;
     for (auto card : hand) { tally[card] += 1; }
-    if (tally[0] == 5) {
+    if (allow_jokers && tally[0] == 5) {
         return five_kind;
     }
     auto max_value = *std::ranges::max_element(
@@ -41,8 +41,10 @@ HandScore to_hand_score(const cards &hand) {
         [](const auto& l, const auto& r) {
             return l.first == 0 || l.second < r.second;
     });
-    max_value.second += tally[0];
-    tally.erase(0);
+    if (allow_jokers) {
+        max_value.second += tally[0];
+        tally.erase(0);
+    }
     const auto min_value = *std::ranges::min_element(tally.begin(), tally.end(), [](const auto& l, const auto& r) { return l.second < r.second; });
     switch(tally.size()) {
         case 1: return five_kind;
@@ -61,7 +63,7 @@ HandScore to_hand_score(const cards &hand) {
     }
 }
 
-auto parse_input(const ElvenIO::input_type &input) {
+auto parse_input(const ElvenIO::input_type &input, const bool allow_jokers) {
     std::vector<play> plays;
 
     for (const auto &line: input) {
@@ -74,16 +76,33 @@ auto parse_input(const ElvenIO::input_type &input) {
         std::transform(
             hand.begin(), hand.end(),
             parsed_hand.begin(),
-            [](auto card) { return to_card_value(card); }
+            [&allow_jokers](auto card) { return to_card_value(card, allow_jokers); }
         );
-        plays.emplace_back(parsed_hand, to_hand_score(parsed_hand), bid);
+        plays.emplace_back(parsed_hand, to_hand_score(parsed_hand, allow_jokers), bid);
     }
 
     return std::move(plays);
 }
 
-auto solve(const ElvenIO::input_type &input) {
-    auto plays = parse_input(input);
+auto part1(const ElvenIO::input_type &input) {
+    auto plays = parse_input(input, false);
+    std::ranges::sort(
+        plays.begin(), plays.end(),
+        [](const auto &left, const auto &right) {
+            auto [left_hand, left_score, left_bid] = left;
+            auto [right_hand, right_score, left_right] = right;
+            return left_score < right_score || left_score == right_score && left_hand < right_hand;
+        }
+    );
+    size_t total_winnings = 0;
+    for (int i = 0; i < plays.size(); ++i) {
+        total_winnings += (i + 1) * std::get<2>(plays[i]);
+    }
+    return total_winnings;
+}
+
+auto part2(const ElvenIO::input_type &input) {
+    auto plays = parse_input(input, true);
     std::ranges::sort(
         plays.begin(), plays.end(),
         [](const auto &left, const auto &right) {
@@ -100,8 +119,13 @@ auto solve(const ElvenIO::input_type &input) {
 }
 
 int main(int _, char** argv) {
+    ElvenMeasure::Reporter reporter;
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
-    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
-    ElvenMeasure::report(result, io_time, solution_time);
+    reporter.add_io_report(io_time);
+    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 10);
+    reporter.add_report(1, result1, solution1_time);
+    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 10);
+    reporter.add_report(2, result2, solution2_time);
+    reporter.report();
     return 0;
 }
