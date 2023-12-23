@@ -82,7 +82,12 @@ Map energize(const Map &map, const Point &start_position, const Point &start_dir
     return energized;
 }
 
-std::size_t solve(const ElvenIO::input_type &input) {
+std::size_t part1(const ElvenIO::input_type &input) {
+    const Map map(input);
+    return energize(map, Point(-1, 0), RIGHT_DIRECTION).find_all(ENERGIZED).size();
+}
+
+std::size_t part2(const ElvenIO::input_type &input) {
     std::size_t count = 0;
     const Map map(input);
     for (int i = 0; i < map.x_size(); ++i) {
@@ -97,8 +102,13 @@ std::size_t solve(const ElvenIO::input_type &input) {
 }
 
 int main(int _, char** argv) {
+    ElvenMeasure::Reporter reporter;
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
-    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
-    ElvenMeasure::report(result, io_time, solution_time);
+    reporter.add_io_report(io_time);
+    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 10);
+    reporter.add_report(1, result1, solution1_time);
+    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 10);
+    reporter.add_report(2, result2, solution2_time);
+    reporter.report();
     return 0;
 }
