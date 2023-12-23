@@ -43,7 +43,7 @@ auto parse_input(const ElvenIO::input_type &input) {
     return std::move(cards);
 }
 
-size_t solve(const ElvenIO::input_type &input) {
+size_t part1(const ElvenIO::input_type &input) {
     const auto cards = parse_input(input);
     return std::transform_reduce(
         cards.begin(),
@@ -61,9 +61,37 @@ size_t solve(const ElvenIO::input_type &input) {
     );
 }
 
+size_t part2(const ElvenIO::input_type &input) {
+    const auto cards = parse_input(input);
+    std::vector counts(cards.size(), 1);
+
+    for(int i = 0; i < cards.size(); ++i) {
+        auto card = cards[i];
+        const auto found = std::ranges::count_if(
+            std::get<1>(card).begin(),
+            std::get<1>(card).end(),
+            [=](auto number) { return std::get<0>(card).contains(number); }
+        );
+        const auto amount_dupes = counts[i];
+        for (int j = i + 1; j <= i + found; ++j) { counts[j] += amount_dupes; }
+    }
+
+    return std::reduce(
+        counts.begin(),
+        counts.end(),
+        0,
+        std::plus()
+    );
+}
+
 int main(int _, char** argv) {
+    ElvenMeasure::Reporter reporter;
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
-    auto [result, solution_time] = ElvenMeasure::execute([=] { return solve(input); }, 100);
-    ElvenMeasure::report(result, io_time, solution_time);
+    reporter.add_io_report(io_time);
+    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 10);
+    reporter.add_report(1, result1, solution1_time);
+    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 10);
+    reporter.add_report(2, result2, solution2_time);
+    reporter.report();
     return 0;
 }
