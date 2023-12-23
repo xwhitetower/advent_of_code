@@ -20,7 +20,7 @@ foreach(day RANGE 1 2)
 endforeach()
 
 # New format
-foreach(day RANGE 3 20)
+foreach(day RANGE 2 20)
     if(${day} LESS 10)
         set(day_prefix 0)
     else()
