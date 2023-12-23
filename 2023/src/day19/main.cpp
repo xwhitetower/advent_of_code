@@ -192,9 +192,9 @@ int main(int _, char** argv) {
     ElvenMeasure::Reporter reporter;
     const auto [input, io_time] = ElvenMeasure::execute([=]{ return ElvenIO::read(argv[1]); });
     reporter.add_io_report(io_time);
-    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 1);
+    auto [result1, solution1_time] = ElvenMeasure::execute([=] { return part1(input); }, 100);
     reporter.add_report(1, result1, solution1_time);
-    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 1);
+    auto [result2, solution2_time] = ElvenMeasure::execute([=] { return part2(input); }, 100);
     reporter.add_report(2, result2, solution2_time);
     reporter.report();
     return 0;
