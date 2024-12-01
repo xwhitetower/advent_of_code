@@ -1,0 +1,41 @@
+name: AoC - 2024
+
+on:
+  push:
+    paths:
+      - .github/workflows/2024.yml
+      - '2024/**'
+
+jobs:
+  AOC-2024:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Aoc 2024 - Deps
+      shell: bash
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x ./llvm.sh
+        sudo ./llvm.sh 17
+        sudo apt-get update
+        sudo apt install libtbb-dev libc++-17-dev libc++abi-17-dev
+
+    - name: AoC 2024 - Build
+      shell: bash
+      run: |
+        cd ${GITHUB_WORKSPACE}/2024/
+        bash build.sh
+
+    - name: AoC 2024 - Run
+      shell: bash
+      run: |
+        cd ${GITHUB_WORKSPACE}/2024/
+        for d in ${GITHUB_WORKSPACE}/2024/src/day*/ ; do
+          exec_name=$(basename ${d})
+          input_path=${GITHUB_WORKSPACE}/2024/data/${exec_name}/input.txt
+          echo "Running day ${exec_name} ${input_path}"
+          bin/${exec_name} ${input_path}
+          echo
+        done
