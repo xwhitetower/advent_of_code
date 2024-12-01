@@ -1,0 +1,5 @@
+cmake-build-*
+package.json
+.idea
+xpacks
+build
